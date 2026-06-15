@@ -1,0 +1,73 @@
+import type { _p_TYP, _pp_TYP } from "../shared/types";
+import { helper } from "../shared/util/helper/index";
+import { hydrator } from "../hydrator";
+import { renderer } from "../renderer";
+const index = async (_p:_p_TYP) => {
+const _helper = await helper();
+    
+    return {
+        set: async (_pp:_pp_TYP) => {
+            const _$r = {
+                r: ``,
+                //style: ``,
+            };
+            const curr = _pp.data.curr || {
+                id: _p.f.uuid(),
+                type: "text",
+                data: {
+                    data: "", //Text
+                }
+            };
+            const _renderer = await renderer({
+                my:{},
+                custom:{},
+                f:{
+                    ..._p.f,
+                   name:(v:string)=>_helper.f.name({id:curr[`id`],name:v})
+                },
+            });
+            const _hydrator = await hydrator({
+                my:{},
+                custom:{},
+                f:{
+                    ..._p.f,
+                   name:(v:string)=>_helper.f.name({id:curr[`id`],name:v})
+                },
+            });
+            const _renderer_rsp = await _renderer.set({
+                data:{
+                    curr:curr,
+                }
+            });
+            setTimeout(async() => {
+            const _hydrator_rsp = await _hydrator.set({
+                data:{
+                    curr:curr,
+                }
+            },);
+            //set..
+            ((_mE)=>{
+            const mE = document.createElement("style");
+            mE.innerHTML = `${_hydrator_rsp.style}`;
+            _mE.appendChild(mE);
+            })(document.head);
+            }, 200);
+            //update..
+            _$r[`r`] = _renderer_rsp[`r`];
+            /*_$r[`style`] = `
+            ${_renderer_rsp[`style`]}
+            `;*/
+            ((_mE)=>{
+            const mE = document.createElement("style");
+            mE.innerHTML = `${_renderer_rsp.style}`;
+            _mE.appendChild(mE);
+            })(document.head);
+
+
+            //set..
+            return _$r;
+        }
+    };
+};
+
+export {index, index as editor};
