@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instagram Business - Setup Auth</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        h1 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 24px;
+        }
+        p {
+            color: #64748b;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        .input-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            color: #475569;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 14px;
+            font-family: 'Courier New', monospace;
+            transition: all 0.3s;
+        }
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        button {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 15px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        button:hover {
+            transform: translateY(-2px);
+        }
+        button:active {
+            transform: translateY(0);
+        }
+        .status {
+            margin-top: 20px;
+            padding: 16px;
+            border-radius: 10px;
+            font-size: 14px;
+            display: none;
+        }
+        .status.success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 2px solid #34d399;
+        }
+        .status.error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 2px solid #f87171;
+        }
+        .current-values {
+            background: #f8fafc;
+            border-radius: 10px;
+            padding: 16px;
+            margin-top: 20px;
+            font-size: 13px;
+        }
+        .current-values h3 {
+            color: #475569;
+            font-size: 14px;
+            margin-bottom: 12px;
+        }
+        .value-item {
+            margin-bottom: 8px;
+            word-break: break-all;
+        }
+        .value-item strong {
+            color: #667eea;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔐 Setup Authentication</h1>
+        <p>Configure JWT token and user ID for Instagram Business frontend</p>
+
+        <div class="input-group">
+            <label for="token">JWT Token (from backend)</label>
+            <textarea id="token" placeholder="Paste your JWT token here..."></textarea>
+        </div>
+
+        <div class="input-group">
+            <label for="userId">User ID</label>
+            <input type="text" id="userId" value="seller_nitin_001" placeholder="seller_nitin_001">
+        </div>
+
+        <button onclick="saveAuth()">💾 Save & Redirect to App</button>
+
+        <div id="status" class="status"></div>
+
+        <div class="current-values">
+            <h3>📋 Current Values</h3>
+            <div class="value-item">
+                <strong>Token:</strong> <span id="currentToken">Not set</span>
+            </div>
+            <div class="value-item">
+                <strong>User ID:</strong> <span id="currentUserId">Not set</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Display current values
+        function updateCurrentValues() {
+            const token = localStorage.getItem('jwt_token') || localStorage.getItem('auth_token');
+            const userId = localStorage.getItem('user_id');
+            
+            document.getElementById('currentToken').textContent = 
+                token ? token.substring(0, 50) + '...' : 'Not set';
+            document.getElementById('currentUserId').textContent = 
+                userId || 'Not set';
+        }
+
+        function saveAuth() {
+            const token = document.getElementById('token').value.trim();
+            const userId = document.getElementById('userId').value.trim();
+            const statusEl = document.getElementById('status');
+
+            // Validate
+            if (!token) {
+                statusEl.textContent = '❌ Please enter a JWT token';
+                statusEl.className = 'status error';
+                statusEl.style.display = 'block';
+                return;
+            }
+
+            if (!userId) {
+                statusEl.textContent = '❌ Please enter a user ID';
+                statusEl.className = 'status error';
+                statusEl.style.display = 'block';
+                return;
+            }
+
+            // Save to localStorage (both keys for compatibility)
+            try {
+                localStorage.setItem('jwt_token', token);
+                localStorage.setItem('auth_token', token);
+                localStorage.setItem('user_id', userId);
+                
+                statusEl.textContent = '✅ Saved! Redirecting to app in 2 seconds...';
+                statusEl.className = 'status success';
+                statusEl.style.display = 'block';
+
+                updateCurrentValues();
+
+                // Redirect to main app (assuming it runs on same origin)
+                setTimeout(() => {
+                    window.location.href = '/';
+                }, 2000);
+            } catch (e) {
+                statusEl.textContent = '❌ Error saving: ' + e.message;
+                statusEl.className = 'status error';
+                statusEl.style.display = 'block';
+            }
+        }
+
+        // Load current values on page load
+        updateCurrentValues();
+
+        // Auto-fill token from URL parameter if present
+        const urlParams = new URLSearchParams(window.location.search);
+        const tokenParam = urlParams.get('token');
+        if (tokenParam) {
+            document.getElementById('token').value = tokenParam;
+        }
+    </script>
+</body>
+</html>

@@ -148,31 +148,51 @@ mE_e!.innerHTML = `
 const _run = async () => {
 
 //set..
-//if (import.meta.client) { // import.meta.server |  import.meta.client  //NOTE: For real world where, we need SSR in action we use "import.meta.server". 
 const _ce_renderer_rsp =  await _ce_renderer.set({
   data:_data
 });
-//console.log(_ce_renderer_rsp.r);
 
 //set..
 _html = _ce_renderer_rsp.r;
 _css_server = _ce_renderer_rsp.style;
 
-
-
-
-//}
 //if (import.meta.client) {
 setTimeout(async() => {
 const _ce_hydrator_rsp =  await _ce_hydrator.set({
   data:_data
 });
-
-//set..
 console.log(_ce_hydrator_rsp);
 
+// Map browser URL path to internal router path
+const _routeMap: Record<string, string> = {
+  "/":                "/dashboard",
+  "/dashboard":       "/dashboard",
+  "/products":        "/products",
+  "/productsview":    "/products",
+  "/categories":      "/categories",
+  "/categoriesview":  "/categories",
+  "/instagram":       "/instagram",
+  "/instagramview":   "/instagram",
+  "/catalog-sync":    "/catalog-sync",
+  "/catalogsync":     "/catalog-sync",
+  "/catalogsyncview": "/catalog-sync",
+  "/icatalogsyncview":"/catalog-sync",
+  "/settings":        "/settings",
+  "/settingsview":    "/settings",
+};
+
+const _navigate = async () => {
+  const _path = window.location.pathname.toLowerCase();
+  const _mapped = _routeMap[_path] ?? "/dashboard";
+  await ce_call("msg", { type: `route:change`, _p: {}, _pp: {}, custom: { path: _mapped } });
+};
+
+await _navigate();
+
+window.addEventListener("popstate", _navigate);
+
 //}  
-}, 200);
+}, 300);
 
 
 

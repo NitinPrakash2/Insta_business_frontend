@@ -1,41 +1,35 @@
-<template></template>
+<template>
+  <RouterView />
+</template>
+
 <script lang="ts" setup>
+import { createPinia } from "pinia";
+import { createRouter, createWebHashHistory } from "vue-router";
+import { defineAsyncComponent } from "vue";
+import { getCurrentInstance } from "vue";
 import type { _p_TYP, _pp_TYP } from "../shared/types";
 
-const {_p,_pp} = defineProps<{
-    _p:_p_TYP,
-    _pp:_pp_TYP,
-}>();
+import DashboardView     from "./src/views/DashboardView.vue";
+import CatalogSyncView   from "./src/views/CatalogSyncView.vue";
 
-(async () => {
-    //==test==//  [START]
-    /* await _p.f.wait_until(() => window.location !== null, 50); */
+const SellerInstagramConnect = defineAsyncComponent(() => import("./src/views/SellerInstagramConnect.vue"));
 
-    //1
-    _p.my[`emitter`] = _p.f.new_emitter();
-    _p.my[`emitter`].on("msg", async (_$:any) => {
-        console.log(`_p.my.emitter.on`, _$);
-    });
-    await _p.my[`emitter`].emit("msg", {
-        type: `on:change`,
-        _p: _p,
-        _pp: _pp,
-    });
+const { _p, _pp } = defineProps<{ _p: _p_TYP; _pp: _pp_TYP }>();
 
-    
-    //2
-    _p.f.listen("msg", async (_$) => {
-        console.log(`_p.f.listen`, _$);
-    });
-    setTimeout(async () => {
-        await _p.f.call("msg", {
-            type: `on:change`,
-            _p: _p,
-            _pp: _pp,
-        });
-    }, 500);
+const app = getCurrentInstance()!.appContext.app;
 
-    //==test==//  [END]
-})();
+app.use(createPinia());
 
+const router = createRouter({
+  history: createWebHashHistory(),
+  routes: [
+    { path: "/",              redirect: "/seller-connect" },
+    { path: "/seller-connect", component: SellerInstagramConnect },
+    { path: "/dashboard",      component: DashboardView },
+    { path: "/catalog-sync",   component: CatalogSyncView },
+  ],
+});
+app.use(router);
+
+_p.my["emitter"] = _p.f.new_emitter();
 </script>

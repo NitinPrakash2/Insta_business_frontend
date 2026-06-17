@@ -106,12 +106,12 @@ export default defineConfig({
     
         viteStaticCopy({
               targets: [
-                // Copy single file (exact output name)
                 {
-                  src: resolve(__dirname, 'src/data.json'),
-                  dest: '.',            // outputs to dist/data.json
+                  src: 'src/data.json',
+                  dest: '.',
                 },
               ],
+              silent: true,
         }),
         MinifyJsonPlugin(),
 
